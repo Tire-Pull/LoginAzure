@@ -1,0 +1,29 @@
+﻿@page "/"
+@using AuthWeb.Session;
+@using Microsoft.AspNetCore.WebUtilities;
+@inject SessionState SessionState;
+@inject NavigationManager Navigator;
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+<br />
+<br />
+Token: @Token
+
+@code{
+
+    public string? Token{ get; set; }
+
+    protected override async Task OnInitializedAsync() {
+        var uri = Navigator.ToAbsoluteUri(Navigator.Uri);
+        if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("code", out var param)) Token = param.First();
+        if (Token == null || Token == "") Token = SessionState.Token;
+        if (Token == null || Token == "") Navigator.NavigateTo("https://login.live.com/oauth20_authorize.srf?client_id=8a4d8da7-aeeb-4a9c-a8cf-dc3cd8c6db2a&scope=bingads.manage&response_type=code&redirect_uri=https://localhost:7142");
+        SessionState.Token = Token;
+        if (param.Count > 0) Navigator.NavigateTo("/");
+    }
+
+}
